@@ -51,12 +51,48 @@ public class Menu {
 
     }
 
-    public void askForFile() {
+    public void askForWarehouseFile() {
 
         //Print menu and get file name
         System.out.println("");
         Scanner sc = new Scanner(System.in).useDelimiter("\n");
-        System.out.print("Fitxer (partint de la carpeta 'raw'): ");
+        System.out.print("Fitxer del magatzem (partint de la carpeta 'raw'): ");
+
+        //Check if there is an input
+        String userInput = sc.nextLine();
+        if(userInput.isEmpty() || userInput.startsWith("\n")) {
+            errorCode = NULL_CONTENT;
+        } else {
+            option = userInput;
+            errorCode = OK;
+        }
+
+    }
+
+    public void askForProductListFile() {
+
+        //Print menu and get file name
+        System.out.println("");
+        Scanner sc = new Scanner(System.in).useDelimiter("\n");
+        System.out.print("Fitxer del llistat de productes (partint de la carpeta 'raw'): ");
+
+        //Check if there is an input
+        String userInput = sc.nextLine();
+        if(userInput.isEmpty() || userInput.startsWith("\n")) {
+            errorCode = NULL_CONTENT;
+        } else {
+            option = userInput;
+            errorCode = OK;
+        }
+
+    }
+
+    public void askForProductDependencyFile() {
+
+        //Print menu and get file name
+        System.out.println("");
+        Scanner sc = new Scanner(System.in).useDelimiter("\n");
+        System.out.print("Fitxer de dependència de productes (partint de la carpeta 'raw'): ");
 
         //Check if there is an input
         String userInput = sc.nextLine();

@@ -1,7 +1,10 @@
+import model.Product;
 import model.ProductManager;
 import model.Shelf;
 import model.WarehouseManager;
 import view.Menu;
+
+import java.util.ArrayList;
 
 public class Main {
 
@@ -36,24 +39,54 @@ public class Main {
                     switch(option) {
                         case CONFIG_WAREHOUSE:
                             productManager.reset();
-                            Menu secondMenu = new Menu();
+                            Menu warehouseMenu = new Menu();
+                            boolean warehouseError;
                             do {
-                                secondMenu.askForFile();
-                                if(secondMenu.getErrorCode() == Menu.NULL_CONTENT) {
+                                warehouseMenu.askForWarehouseFile();
+                                if(warehouseMenu.getErrorCode() == Menu.NULL_CONTENT) {
                                     System.out.println(System.lineSeparator() + "No s'ha introduït res!");
+                                    warehouseError = true;
                                 } else {
-                                    if(warehouseManager.init(secondMenu.getOption())) {
+                                    if(warehouseManager.init(warehouseMenu.getOption())) {
                                         System.out.println(System.lineSeparator() + "El magatzem ja està disponible!");
                                         printWarehouse(warehouseManager.getShelves());
                                     } else {
                                         System.out.println(System.lineSeparator() + "El magatzem no s'ha carregat correctament!");
                                     }
+                                    warehouseError = false;
                                 }
-                            } while(secondMenu.getErrorCode() == Menu.NULL_CONTENT);
+                            } while(warehouseError);
                             break;
                         case LOAD_PRODUCTS:
                             if(warehouseManager.isWarehouseInit()) {
-
+                                Menu productMenu = new Menu();
+                                boolean productError;
+                                do {
+                                    productMenu.askForProductListFile();
+                                    if(productMenu.getErrorCode() == Menu.NULL_CONTENT) {
+                                        System.out.println(System.lineSeparator() + "No s'ha introduït res!");
+                                        productError = true;
+                                    } else {
+                                        String productListFile = productMenu.getOption();
+                                        productError = false;
+                                        do {
+                                            productMenu.askForProductDependencyFile();
+                                            if(productMenu.getErrorCode() == Menu.NULL_CONTENT) {
+                                                System.out.println(System.lineSeparator() + "No s'ha introduït res!");
+                                                productError = true;
+                                            } else {
+                                                String productDependencyFile = productMenu.getOption();
+                                                if(productManager.initProducts(productListFile, productDependencyFile)) {
+                                                    System.out.println(System.lineSeparator() + "Els productes ja estan disponibles!");
+                                                    printProducts(productManager.getProducts());
+                                                    printGraph(productManager.getDependencyMatrix());
+                                                } else {
+                                                    System.out.println(System.lineSeparator() + "Els productes no s'han carregat correctament!");
+                                                }
+                                            }
+                                        } while(productError);
+                                    }
+                                } while(productError);
                             } else {
                                 System.out.println(System.lineSeparator() + "El magatzem no està disponible!");
                             }
@@ -97,6 +130,7 @@ public class Main {
      * @param shelves Estanteries del magatzem
      */
     private static void printWarehouse(Shelf[][] shelves) {
+        System.out.println();
         for(int i = 0; i < shelves.length; i++) {
             for(int j = 0; j < shelves[i].length; j++) {
                 if(shelves[j][i] == null) {
@@ -104,6 +138,34 @@ public class Main {
                 } else {
                     System.out.print(1);
                 }
+            }
+            System.out.println();
+        }
+    }
+
+    /**
+     * Serveix per mostrar per consola els productes disponibles
+     * @param products Productes
+     */
+    private static void printProducts(ArrayList<Product> products) {
+        System.out.println();
+        for(int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            System.out.print("Producte " + i + ": ");
+            System.out.print(product.getId() + " ");
+            System.out.println(product.getName());
+        }
+    }
+
+    /**
+     * Serveix per mostrar el graph de dependència
+     * @param graph Matriu a mostrar
+     */
+    private static void printGraph(double[][] graph) {
+        System.out.println();
+        for(int i = 0; i < graph.length; i++) {
+            for(int j = 0; j < graph[i].length; j++) {
+                System.out.print(graph[j][i] + " ");
             }
             System.out.println();
         }

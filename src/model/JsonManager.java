@@ -31,22 +31,28 @@ public class JsonManager {
     private final static String SHELVES_Y = "y_start";
     private final static String SHELVES_ORIENTATION = "orientation";
 
-    private JSONObject jsonContent;
+    //Product params
+    private final static String PRODUCT_ID = "id";
+    private final static String PRODUCT_NAME = "name";
 
-    public JsonManager(String jsonContent) throws JSONException {
-        this.jsonContent = new JSONObject(jsonContent);
+    private String jsonContent;
+
+    public JsonManager(String jsonContent) {
+        this.jsonContent = jsonContent;
     }
 
     public Dimension getDimension() throws JSONException {
         Dimension dimension = new Dimension();
-        JSONObject jsonObject = jsonContent.getJSONObject(DIMENSION);
+        JSONObject object = new JSONObject(jsonContent);
+        JSONObject jsonObject = object.getJSONObject(DIMENSION);
         dimension.setSize(jsonObject.getInt(DIMENSION_X), jsonObject.getInt(DIMENSION_Y));
         return dimension;
     }
 
     public Point getEntrance() throws JSONException {
         Point entrance = new Point();
-        JSONObject jsonObject = jsonContent.getJSONObject(ENTRANCE);
+        JSONObject object = new JSONObject(jsonContent);
+        JSONObject jsonObject = object.getJSONObject(ENTRANCE);
         entrance.x = jsonObject.getInt(ENTRANCE_X);
         entrance.y = jsonObject.getInt(ENTRANCE_Y);
         return entrance;
@@ -55,7 +61,8 @@ public class JsonManager {
     public ArrayList<ShelfConfig> getShelvesConfig() throws JSONException {
 
         ArrayList<ShelfConfig> shelvesConfig = new ArrayList<>();
-        JSONArray jsonArray = jsonContent.getJSONArray(CONFIG);
+        JSONObject object = new JSONObject(jsonContent);
+        JSONArray jsonArray = object.getJSONArray(CONFIG);
         int total = jsonArray.length();
 
         for(int i = 0; i < total; i++) {
@@ -71,16 +78,37 @@ public class JsonManager {
     }
 
     public int getTotalShelvesPattern() throws JSONException {
-        return jsonContent.getJSONArray(SHELVES).length();
+        JSONObject object = new JSONObject(jsonContent);
+        return object.getJSONArray(SHELVES).length();
     }
 
     public ShelfPattern getShelfPattern(int position) throws JSONException {
         ShelfPattern shelfPattern = new ShelfPattern();
-        JSONObject jsonObject = jsonContent.getJSONArray(SHELVES).getJSONObject(position);
+        JSONObject object = new JSONObject(jsonContent);
+        JSONObject jsonObject = object.getJSONArray(SHELVES).getJSONObject(position);
         shelfPattern.setShelfId(jsonObject.getInt(SHELVES_CONFIG));
         shelfPattern.setStartPoint(new Point(jsonObject.getInt(SHELVES_X), jsonObject.getInt(SHELVES_Y)));
         shelfPattern.setOrientation(jsonObject.getString(SHELVES_ORIENTATION).toCharArray()[0]);
         return shelfPattern;
+    }
+
+    public ArrayList<Product> getProductList() throws JSONException {
+
+        ArrayList<Product> products = new ArrayList<>();
+
+        JSONArray jsonArray = new JSONArray(jsonContent);
+        int total = jsonArray.length();
+
+        for(int i = 0; i < total; i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            Product product = new Product();
+            product.setId(jsonObject.getLong(PRODUCT_ID));
+            product.setName(jsonObject.getString(PRODUCT_NAME));
+            products.add(product);
+        }
+
+        return products;
+
     }
 
 }

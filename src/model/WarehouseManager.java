@@ -27,6 +27,8 @@ public class WarehouseManager {
     public boolean init(String fileName) {
 
         warehouseFull = false;
+        shelves = null;
+        entrance = null;
 
         //Read file if possible
         try {
@@ -93,6 +95,8 @@ public class WarehouseManager {
             return true;
 
         } catch(IOException | JSONException e) {
+            shelves = null;
+            entrance = null;
             return false;
         }
 
@@ -103,7 +107,7 @@ public class WarehouseManager {
     }
 
     public boolean isWarehouseInit() {
-        return shelves != null;
+        return shelves != null && entrance != null;
     }
 
     public boolean isWarehouseFull() {
