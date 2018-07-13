@@ -1,5 +1,8 @@
-package model;
+package controller;
 
+import model.Product;
+import model.ShelfConfig;
+import model.ShelfPattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,11 +53,11 @@ public class JsonManager {
     }
 
     public Point getEntrance() throws JSONException {
-        Point entrance = new Point();
         JSONObject object = new JSONObject(jsonContent);
         JSONObject jsonObject = object.getJSONObject(ENTRANCE);
-        entrance.x = jsonObject.getInt(ENTRANCE_X);
-        entrance.y = jsonObject.getInt(ENTRANCE_Y);
+        int x = jsonObject.getInt(ENTRANCE_X);
+        int y = jsonObject.getInt(ENTRANCE_Y);
+        Point entrance = new Point(x, y);
         return entrance;
     }
 

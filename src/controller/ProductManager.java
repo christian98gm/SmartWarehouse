@@ -1,5 +1,6 @@
-package model;
+package controller;
 
+import model.Product;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
@@ -14,12 +15,11 @@ public class ProductManager {
     private final static String PATH = "raw/";
 
     private ArrayList<Product> products;
-    private double[][] dependencyMatrix;
-    private HashMap<Long, Integer> hashMap;
+    private double[][] graph;
 
     public ProductManager() {}
 
-    public boolean initProducts(String productListFile, String productDependencyFile) {
+    public boolean initProducts(String productListFile) {
 
         reset();
 
@@ -41,33 +41,6 @@ public class ProductManager {
             //Get products
             products = fileList.getProductList();
 
-            //Prepare product dependency matrix
-            int size = products.size();
-            dependencyMatrix = new double[size][size];
-            hashMap = new HashMap<>();
-            for(int i = 0; i < size; i++) {
-                Product product = products.get(i);
-                hashMap.put(product.getId(), i);
-            }
-
-            //Get products dependency
-            br.close();
-            br = new BufferedReader(new FileReader(PATH + productDependencyFile));
-            line = br.readLine();
-
-            while(line != null && (!line.isEmpty() || line.startsWith("\n"))) {
-
-                //Obtain line information
-                String[] content = line.split(" ");
-                int i = hashMap.get(Long.parseLong(content[0]));
-                int j = hashMap.get(Long.parseLong(content[1]));
-                dependencyMatrix[i][j] = Double.parseDouble(content[2]);
-
-                //Prepare next line
-                line = br.readLine();
-
-            }
-
             return true;
 
         } catch(IOException | JSONException | NumberFormatException e) {
@@ -77,22 +50,56 @@ public class ProductManager {
 
     }
 
-    public boolean isInit() {
-        return products != null && hashMap != null && dependencyMatrix != null;
-    }
+    public boolean initGraph(String productDependencyFile) {
 
-    public void reset() {
-        products = null;
-        hashMap = null;
-        dependencyMatrix = null;
+        try {
+
+            //Prepare product dependency matrix
+            int size = products.size();
+            graph = new double[size][size];
+            HashMap<Long, Integer> hashMap = new HashMap<>();
+            for (int i = 0; i < size; i++) {
+                Product product = products.get(i);
+                hashMap.put(product.getId(), i);
+            }
+
+            //Get products dependency
+            BufferedReader br = new BufferedReader(new FileReader(PATH + productDependencyFile));
+            String line = br.readLine();
+
+            while (line != null && (!line.isEmpty() || line.startsWith("\n"))) {
+
+                //Obtain line information
+                String[] content = line.split(" ");
+                int i = hashMap.get(Long.parseLong(content[0]));
+                int j = hashMap.get(Long.parseLong(content[1]));
+                graph[i][j] = Double.parseDouble(content[2]);
+
+                //Prepare next line
+                line = br.readLine();
+
+            }
+
+            return true;
+
+        } catch(IOException | NumberFormatException e) {
+            reset();
+            return false;
+        }
+
     }
 
     public ArrayList<Product> getProducts() {
         return products;
     }
 
-    public double[][] getDependencyMatrix() {
-        return dependencyMatrix;
+    public double[][] getGraph() {
+        return graph;
+    }
+
+    public void reset() {
+        products = null;
+        graph = null;
     }
 
 }

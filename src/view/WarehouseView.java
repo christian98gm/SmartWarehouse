@@ -71,7 +71,7 @@ public class WarehouseView extends JFrame {
         this.setTitle(ViewConstants.TITLE);
         this.setVisible(true);
         this.setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
 
@@ -167,8 +167,7 @@ public class WarehouseView extends JFrame {
      */
     public void setBoxInfo(String descriptions[]) {
         int i = 0;
-
-        for (String desc : descriptions)
+        for(String desc : descriptions)
             jlInfo[i++].setText(desc);
     }
 
@@ -188,7 +187,6 @@ public class WarehouseView extends JFrame {
      * @param cost  El valor de cost.
      */
     public void setTrackCost(int cost) {
-
         this.jlTrackScore.setText(String.format(TRACK_COST_LABEL_FORMAT, cost));
     }
 
@@ -199,7 +197,6 @@ public class WarehouseView extends JFrame {
      *                  controlarà la vista.
      */
     public void setMapMouseListener(MouseListener listener) {
-
         this.jpGrid.addMouseListener(listener);
     }
 

@@ -2,12 +2,33 @@ package model;
 
 public class Shelf {
 
-    private final static int TOTAL_PRODUCTS = 3;
+    private Point3D point;
+    private double distance;
+    private Product product;
 
-    private Product[] products;
+    public Shelf(Point3D shelfPoint, Point3D entrancePoint) {
+        this.point = shelfPoint;
+        distance = shelfPoint.distance(entrancePoint);
+    }
 
-    public Shelf() {
-        products = new Product[TOTAL_PRODUCTS];
+    public Point3D getPoint() {
+        return point;
+    }
+
+    public void setPoint(Point3D point) {
+        this.point = point;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
 }
