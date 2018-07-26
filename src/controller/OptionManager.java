@@ -40,7 +40,7 @@ public class OptionManager {
                 break;
             case SERVE_ORDER:
                 if(warehouseManager.readyForRequests()) {
-                    System.out.println(System.lineSeparator() + "In progress...");
+                    showRobotPath();
                 } else {
                     System.out.println(System.lineSeparator() + "No hi ha cap producte al magatzem!");
                 }
@@ -48,6 +48,15 @@ public class OptionManager {
             case EXIT:
                 System.out.println(System.lineSeparator() + "Gràcies per usar els nostres serveis!");
                 break;
+        }
+    }
+
+    private void showRobotPath(){
+
+        warehouseManager.serveProducts();
+        ArrayList<Point> path = warehouseManager.getBestTrace();
+        for(Point p : path){
+            warehouseView.paintCell(p.x,p.y,Color.YELLOW);
         }
     }
 
