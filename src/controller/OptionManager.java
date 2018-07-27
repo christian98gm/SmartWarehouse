@@ -28,7 +28,7 @@ public class OptionManager {
     }
 
     public void optionChosen(int option) {
-        switch(option) {
+        switch (option) {
             case CONFIG_WAREHOUSE:
                 configWarehouse();
                 break;
@@ -39,7 +39,7 @@ public class OptionManager {
                 distributeProducts();
                 break;
             case SERVE_ORDER:
-                if(warehouseManager.readyForRequests()) {
+                if (warehouseManager.readyForRequests()) {
                     showRobotPath();
                 } else {
                     System.out.println(System.lineSeparator() + "No hi ha cap producte al magatzem!");
@@ -51,13 +51,23 @@ public class OptionManager {
         }
     }
 
-    private void showRobotPath(){
+    private void showRobotPath() {
 
+        //Loads the command file
+        loadCommand();
+        warehouseManager.setCommandProducts(productManager.getCommandProducts());
+
+        // Looks for the best path to take all products
         warehouseManager.serveProducts();
         ArrayList<Point> path = warehouseManager.getBestTrace();
-        for(Point p : path){
-            warehouseView.paintCell(p.x,p.y,Color.YELLOW);
+
+        // Paints the path in yellow
+        for (Point p : path) {
+            warehouseView.paintCell(p.x, p.y, Color.YELLOW);
         }
+
+        // Shows how many steps the robot makes to take all products
+        warehouseView.setTrackCost(warehouseManager.getBestSteps());
     }
 
     private void configWarehouse() {
@@ -70,25 +80,45 @@ public class OptionManager {
         boolean warehouseError;
         do {
             menu.askForWarehouseFile();
-            if(menu.getErrorCode() == Menu.NULL_CONTENT) {
+            if (menu.getErrorCode() == Menu.NULL_CONTENT) {
                 warehouseError = true;
                 System.out.println(System.lineSeparator() + "No s'ha introduït res!");
             } else {
                 warehouseError = false;
-                if(warehouseManager.init(menu.getOption())) {
+                if (warehouseManager.init(menu.getOption())) {
                     System.out.println(System.lineSeparator() + "El magatzem ja està disponible!");
                 } else {
                     System.out.println(System.lineSeparator() + "El magatzem no s'ha carregat correctament!");
                 }
             }
-        } while(warehouseError);
+        } while (warehouseError);
 
+    }
+
+    private void loadCommand() {
+        //Show menu
+        Menu menu = new Menu();
+        boolean productError;
+        do {
+            menu.askForCommandFile();
+            if (menu.getErrorCode() == Menu.NULL_CONTENT) {
+                productError = true;
+                System.out.println(System.lineSeparator() + "No s'ha introduït res!");
+            } else {
+                productError = false;
+                if (productManager.initCommand(menu.getOption())) {
+                    System.out.println(System.lineSeparator() + "Comanda carregada amb èxit!");
+                } else {
+                    System.out.println(System.lineSeparator() + "La comanda no s'han carregat correctament!");
+                }
+            }
+        } while (productError);
     }
 
     private void loadProducts() {
 
         //Check if warehouse is loaded
-        if(!warehouseManager.hasShelves()) {
+        if (!warehouseManager.hasShelves()) {
             System.out.println(System.lineSeparator() + "El magatzem no està disponible!");
             return;
         }
@@ -98,23 +128,23 @@ public class OptionManager {
         boolean productError;
         do {
             menu.askForProductListFile();
-            if(menu.getErrorCode() == Menu.NULL_CONTENT) {
+            if (menu.getErrorCode() == Menu.NULL_CONTENT) {
                 productError = true;
                 System.out.println(System.lineSeparator() + "No s'ha introduït res!");
             } else {
                 productError = false;
-                if(productManager.initProducts(menu.getOption())) {
+                if (productManager.initProducts(menu.getOption())) {
                     System.out.println(System.lineSeparator() + "Productes carregats amb èxit!");
                     printProducts(productManager.getProducts());    //TODO
                     menu = new Menu();  //Reset menu to avoid conflicts
                     do {
                         menu.askForProductDependencyFile();
-                        if(menu.getErrorCode() == Menu.NULL_CONTENT) {
+                        if (menu.getErrorCode() == Menu.NULL_CONTENT) {
                             productError = true;
                             System.out.println(System.lineSeparator() + "No s'ha introduït res!");
                         } else {
                             productError = false;
-                            if(productManager.initGraph(menu.getOption())) {
+                            if (productManager.initGraph(menu.getOption())) {
                                 warehouseManager.setProductData(productManager.getProducts(), productManager.getGraph());
                                 System.out.println(System.lineSeparator() + "Graph carregat amb èxit!");
                                 printGraph(productManager.getGraph());          //TODO
@@ -123,17 +153,17 @@ public class OptionManager {
                                 System.out.println(System.lineSeparator() + "El graph no s'han carregat correctament!");
                             }
                         }
-                    } while(productError);
+                    } while (productError);
                 } else {
                     System.out.println(System.lineSeparator() + "Els productes no s'han carregat correctament!");
                 }
             }
-        } while(productError);
+        } while (productError);
 
     }
 
     private void distributeProducts() {
-        if(warehouseManager.hasProducts()) {
+        if (warehouseManager.hasProducts()) {
             //Distribute products
             warehouseManager.distributeProducts();
             //Show view
@@ -146,7 +176,7 @@ public class OptionManager {
     private void showWarehouse() {
 
         //Close existent view
-        if(warehouseView != null) {
+        if (warehouseView != null) {
             warehouseView.dispatchEvent(new WindowEvent(warehouseView, WindowEvent.WINDOW_CLOSING));
         }
 
@@ -166,11 +196,12 @@ public class OptionManager {
 
     /**
      * Serveix per mostrar per consola els productes disponibles
+     *
      * @param products Productes
      */
     private void printProducts(ArrayList<Product> products) {
         System.out.println();
-        for(int i = 0; i < products.size(); i++) {
+        for (int i = 0; i < products.size(); i++) {
             Product product = products.get(i);
             System.out.print("Producte " + i + ": ");
             System.out.print(product.getId() + " ");
@@ -180,12 +211,13 @@ public class OptionManager {
 
     /**
      * Serveix per mostrar el graph de dependència
+     *
      * @param graph Matriu a mostrar
      */
     private void printGraph(double[][] graph) {
         System.out.println();
-        for(int i = 0; i < graph.length; i++) {
-            for(int j = 0; j < graph[i].length; j++) {
+        for (int i = 0; i < graph.length; i++) {
+            for (int j = 0; j < graph[i].length; j++) {
                 System.out.print(graph[j][i] + " ");
             }
             System.out.println();

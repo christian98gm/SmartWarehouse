@@ -87,6 +87,23 @@ public class Menu {
 
     }
 
+    public void askForCommandFile(){
+
+        //Print menu and get file name
+        System.out.println("");
+        Scanner sc = new Scanner(System.in).useDelimiter("\n");
+        System.out.print("Fitxer de la commanda (partint de la carpeta 'raw'): ");
+
+        //Check if there is an input
+        String userInput = sc.nextLine();
+        if(userInput.isEmpty() || userInput.startsWith("\n")) {
+            errorCode = NULL_CONTENT;
+        } else {
+            option = userInput;
+            errorCode = OK;
+        }
+    }
+
     public void askForProductDependencyFile() {
 
         //Print menu and get file name

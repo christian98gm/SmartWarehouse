@@ -28,6 +28,7 @@ public class WarehouseManager {
     private ArrayList<Product> products;
     private int[] productsTakenTurn;
     private ArrayList<Product> productsTaken;
+    private ArrayList<Product> commandProducts;
     private double[][] graph;
 
     //Score (relative to graph params and distance between products)
@@ -214,13 +215,13 @@ public class WarehouseManager {
         bestTrace = new ArrayList<>();
         tempResult = new ArrayList<>();
         productsTaken = new ArrayList<>();
-        productsTakenTurn = new int[products.size()];
+        productsTakenTurn = new int[commandProducts.size()];
 
         ArrayList<Integer> config = new ArrayList<>();
         int[][] marks =  new int[warehouse.length][warehouse[0].length];
         round = 0;
-        config.add(-1);
-        marcar(config,productsTaken,getEntrance().x,getEntrance().y,marks);
+        config.add(-1);                                                         // Mira la primera casella abans
+        marcar(config,productsTaken,getEntrance().x,getEntrance().y,marks);     // de començar amb el recorregut.
         robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
 
     }
@@ -237,7 +238,7 @@ public class WarehouseManager {
             marcar(config, productsTaken, indexX, indexY, marks);
             int tempResultLastPos = tempResult.size() - 1;
             Point p = new Point(tempResult.get(tempResultLastPos).x, tempResult.get(tempResultLastPos).y);
-            if (productsTaken.size() == products.size()) {                                                                                          // es solucio
+            if (productsTaken.size() == commandProducts.size()) {                                                                                          // es solucio
                 if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // es bona
                     if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] &&
                             marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
@@ -293,9 +294,11 @@ public class WarehouseManager {
                 if (((p.x - 1 == shelf.getShelvesPoint().x || p.x + 1 == shelf.getShelvesPoint().x) && p.y == shelf.getShelvesPoint().y) || ((p.y - 1 == shelf.getShelvesPoint().y || p.y + 1 == shelf.getShelvesPoint().y) && p.x == shelf.getShelvesPoint().x)) {
 
                     for (int i = 0; i < 3; i++) {
-                        if (products.contains(shelf.getShelves()[i].getProduct()) && !productsTaken.contains(shelf.getShelves()[i].getProduct())) {
-                            productsTakenTurn[productsTaken.size()] = tempResult.size();
-                            productsTaken.add(shelf.getShelves()[i].getProduct());
+                        for (Product pr : commandProducts){
+                            if(pr.equals(shelf.getShelves()[i].getProduct()) && !productsTaken.contains(shelf.getShelves()[i].getProduct())){
+                                productsTakenTurn[productsTaken.size()] = tempResult.size();
+                                productsTaken.add(shelf.getShelves()[i].getProduct());
+                            }
                         }
                     }
                 }
@@ -383,6 +386,10 @@ public class WarehouseManager {
 
     }
 
+    public void setCommandProducts(ArrayList<Product> commandProducts) {
+        this.commandProducts = commandProducts;
+    }
+
     public double getScore() {
         return score;
     }
@@ -394,4 +401,5 @@ public class WarehouseManager {
     public ArrayList<Point> getBestTrace() {
         return bestTrace;
     }
+    public int getBestSteps(){return bestSteps;}
 }

@@ -15,6 +15,7 @@ public class ProductManager {
     private final static String PATH = "raw/";
 
     private ArrayList<Product> products;
+    private ArrayList<Product> commandProducts;
     private double[][] graph;
 
     public ProductManager() {}
@@ -48,6 +49,39 @@ public class ProductManager {
             return false;
         }
 
+    }
+
+    public boolean initCommand(String filename){
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(PATH + filename));
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while(line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+
+            //Manage json file
+            JsonManager fileList = new JsonManager(sb.toString());
+
+            commandProducts = new ArrayList<>();
+            //Get products
+            for(Product p:  fileList.getProductList()){
+                for (int i = 0; i < products.size(); i++){
+                    if(products.get(i).getId() == p.getId()){
+                        commandProducts.add(products.get(i));
+                    }
+                }
+            }
+
+            return true;
+
+        } catch(IOException | JSONException | NumberFormatException e) {
+            return false;
+        }
     }
 
     public boolean initGraph(String productDependencyFile) {
@@ -91,6 +125,10 @@ public class ProductManager {
 
     public ArrayList<Product> getProducts() {
         return products;
+    }
+
+    public ArrayList<Product> getCommandProducts() {
+        return commandProducts;
     }
 
     public double[][] getGraph() {
