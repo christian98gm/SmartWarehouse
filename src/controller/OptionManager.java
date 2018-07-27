@@ -54,20 +54,21 @@ public class OptionManager {
     private void showRobotPath() {
 
         //Loads the command file
-        loadCommand();
-        warehouseManager.setCommandProducts(productManager.getCommandProducts());
+        if (loadCommand()) {
+            warehouseManager.setCommandProducts(productManager.getCommandProducts());
 
-        // Looks for the best path to take all products
-        warehouseManager.serveProducts();
-        ArrayList<Point> path = warehouseManager.getBestTrace();
+            // Looks for the best path to take all products
+            warehouseManager.serveProducts();
+            ArrayList<Point> path = warehouseManager.getBestTrace();
 
-        // Paints the path in yellow
-        for (Point p : path) {
-            warehouseView.paintCell(p.x, p.y, Color.YELLOW);
+            // Paints the path in yellow
+            for (Point p : path) {
+                warehouseView.paintCell(p.x, p.y, Color.YELLOW);
+            }
+
+            // Shows how many steps the robot makes to take all products
+            warehouseView.setTrackCost(warehouseManager.getBestSteps());
         }
-
-        // Shows how many steps the robot makes to take all products
-        warehouseView.setTrackCost(warehouseManager.getBestSteps());
     }
 
     private void configWarehouse() {
@@ -95,7 +96,7 @@ public class OptionManager {
 
     }
 
-    private void loadCommand() {
+    private boolean loadCommand() {
         //Show menu
         Menu menu = new Menu();
         boolean productError;
@@ -110,9 +111,11 @@ public class OptionManager {
                     System.out.println(System.lineSeparator() + "Comanda carregada amb èxit!");
                 } else {
                     System.out.println(System.lineSeparator() + "La comanda no s'han carregat correctament!");
+                    return false;
                 }
             }
         } while (productError);
+        return true;
     }
 
     private void loadProducts() {

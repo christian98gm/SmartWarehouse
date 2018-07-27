@@ -218,10 +218,9 @@ public class WarehouseManager {
         productsTakenTurn = new int[commandProducts.size()];
 
         ArrayList<Integer> config = new ArrayList<>();
-        int[][] marks =  new int[warehouse.length][warehouse[0].length];
+        int[][] marks = new int[warehouse.length][warehouse[0].length];
         round = 0;
-        config.add(-1);                                                         // Mira la primera casella abans
-        marcar(config,productsTaken,getEntrance().x,getEntrance().y,marks);     // de començar amb el recorregut.
+
         robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
 
     }
@@ -229,41 +228,47 @@ public class WarehouseManager {
 
     private void robotBacktracking(ArrayList<Integer> config, ArrayList<Product> productsTaken, int indexX, int indexY, int[][] marks) {
 
-        config.add(-1);                                                                                                                             // preparar recorregut
-        int indexConfig = config.size() - 1;
-        while (config.get(indexConfig) < 3) {                                                                                                       // hi ha successor
+        config.add(-1);                                                                                                                                 // preparar recorregut
+        round++;
+        System.out.println("Round : " + round);
+        if (config.size() > 1) {
 
-            config.set(indexConfig, config.get(indexConfig) + 1);                                                                                   // seguent  germa
+            int indexConfig = config.size() - 1;
+            while (config.get(indexConfig) < 3) {                                                                                                       // hi ha successor
 
-            marcar(config, productsTaken, indexX, indexY, marks);
-            int tempResultLastPos = tempResult.size() - 1;
-            Point p = new Point(tempResult.get(tempResultLastPos).x, tempResult.get(tempResultLastPos).y);
-            if (productsTaken.size() == commandProducts.size()) {                                                                                          // es solucio
-                if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // es bona
-                    if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] &&
-                            marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
-                        if (tempResult.size() < bestSteps) {                                                                                        // tractar solucio
-                            bestTrace = new ArrayList<>(tempResult);
-                            bestSteps = bestTrace.size();
+                config.set(indexConfig, config.get(indexConfig) + 1);                                                                                   // seguent  germa
+
+                marcar(config, productsTaken, indexX, indexY, marks);
+                int tempResultLastPos = tempResult.size() - 1;
+                Point p = new Point(tempResult.get(tempResultLastPos).x, tempResult.get(tempResultLastPos).y);
+                if (productsTaken.size() == commandProducts.size()) {                                                                                   // es solucio
+                    if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // es bona
+                        if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] &&
+                                marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
+                            if (tempResult.size() < bestSteps) {                                                                                        // tractar solucio
+                                bestTrace = new ArrayList<>(tempResult);
+                                bestSteps = bestTrace.size();
+                            }
                         }
                     }
-                }
-            } else {                                                                                                                                // no es solucio
-                if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // bona
-                    if (tempResult.get(tempResultLastPos).x != -1 && tempResult.get(tempResultLastPos).y != -1) {
-                        if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] && marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
-                            if (tempResult.size() < bestSteps) {                                                                                    // poda
-                                robotBacktracking(config, productsTaken, p.x, p.y, marks);
+                } else {                                                                                                                                // no es solucio
+                    if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // bona
+                        if (tempResult.get(tempResultLastPos).x != -1 && tempResult.get(tempResultLastPos).y != -1) {
+                            if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] && marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
+                                if (tempResult.size() < bestSteps) {                                                                                    // poda
+                                    robotBacktracking(config, productsTaken, p.x, p.y, marks);
+                                }
                             }
                         }
                     }
                 }
+                desmarcar(productsTaken, marks);
             }
-            round++;
-            System.out.println(round);
-            desmarcar(productsTaken, marks);
+            config.remove(config.size() - 1);
+        } else {
+            marcar(config, productsTaken, getEntrance().x, getEntrance().y, marks);
+            robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
         }
-        config.remove(config.size() - 1);
     }
 
 
@@ -294,8 +299,8 @@ public class WarehouseManager {
                 if (((p.x - 1 == shelf.getShelvesPoint().x || p.x + 1 == shelf.getShelvesPoint().x) && p.y == shelf.getShelvesPoint().y) || ((p.y - 1 == shelf.getShelvesPoint().y || p.y + 1 == shelf.getShelvesPoint().y) && p.x == shelf.getShelvesPoint().x)) {
 
                     for (int i = 0; i < 3; i++) {
-                        for (Product pr : commandProducts){
-                            if(pr.equals(shelf.getShelves()[i].getProduct()) && !productsTaken.contains(shelf.getShelves()[i].getProduct())){
+                        for (Product pr : commandProducts) {
+                            if (pr.equals(shelf.getShelves()[i].getProduct()) && !productsTaken.contains(shelf.getShelves()[i].getProduct())) {
                                 productsTakenTurn[productsTaken.size()] = tempResult.size();
                                 productsTaken.add(shelf.getShelves()[i].getProduct());
                             }
@@ -401,5 +406,8 @@ public class WarehouseManager {
     public ArrayList<Point> getBestTrace() {
         return bestTrace;
     }
-    public int getBestSteps(){return bestSteps;}
+
+    public int getBestSteps() {
+        return bestSteps;
+    }
 }
