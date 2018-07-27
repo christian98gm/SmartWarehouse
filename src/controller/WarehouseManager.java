@@ -215,15 +215,16 @@ public class WarehouseManager {
         tempResult = new ArrayList<>();
         productsTaken = new ArrayList<>();
         productsTakenTurn = new int[products.size()];
+
         ArrayList<Integer> config = new ArrayList<>();
         int[][] marks =  new int[warehouse.length][warehouse[0].length];
         round = 0;
-
         config.add(-1);
         marcar(config,productsTaken,getEntrance().x,getEntrance().y,marks);
         robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
 
     }
+
 
     private void robotBacktracking(ArrayList<Integer> config, ArrayList<Product> productsTaken, int indexX, int indexY, int[][] marks) {
 
@@ -242,6 +243,7 @@ public class WarehouseManager {
                             marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
                         if (tempResult.size() < bestSteps) {                                                                                        // tractar solucio
                             bestTrace = new ArrayList<>(tempResult);
+                            bestSteps = bestTrace.size();
                         }
                     }
                 }
@@ -249,7 +251,9 @@ public class WarehouseManager {
                 if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // bona
                     if (tempResult.get(tempResultLastPos).x != -1 && tempResult.get(tempResultLastPos).y != -1) {
                         if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] && marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
-                            robotBacktracking(config, productsTaken, p.x, p.y, marks);
+                            if (tempResult.size() < bestSteps) {                                                                                    // poda
+                                robotBacktracking(config, productsTaken, p.x, p.y, marks);
+                            }
                         }
                     }
                 }
