@@ -242,23 +242,16 @@ public class WarehouseManager {
                 int tempResultLastPos = tempResult.size() - 1;
                 Point p = new Point(tempResult.get(tempResultLastPos).x, tempResult.get(tempResultLastPos).y);
                 if (productsTaken.size() == commandProducts.size()) {                                                                                   // es solucio
-                    if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // es bona
-                        if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] &&
-                                marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
-                            if (tempResult.size() < bestSteps) {                                                                                        // tractar solucio
-                                bestTrace = new ArrayList<>(tempResult);
-                                bestSteps = bestTrace.size();
-                            }
+                    if (bona(marks)) {                                                                                                                  // bona
+                        if (tempResult.size() < bestSteps) {                                                                                            // tractar solucio
+                            bestTrace = new ArrayList<>(tempResult);
+                            bestSteps = bestTrace.size();
                         }
                     }
                 } else {                                                                                                                                // no es solucio
-                    if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // bona
-                        if (tempResult.get(tempResultLastPos).x != -1 && tempResult.get(tempResultLastPos).y != -1) {
-                            if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] && marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
-                                if (tempResult.size() < bestSteps) {                                                                                    // poda
-                                    robotBacktracking(config, productsTaken, p.x, p.y, marks);
-                                }
-                            }
+                    if (bona(marks)) {
+                        if (tempResult.size() < bestSteps) {                                                                                    // poda
+                            robotBacktracking(config, productsTaken, p.x, p.y, marks);
                         }
                     }
                 }
@@ -271,6 +264,19 @@ public class WarehouseManager {
         }
     }
 
+    private boolean bona(int[][] marks) {
+
+        int tempResultLastPos = tempResult.size() - 1;
+        if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // es bona
+            if (tempResult.get(tempResultLastPos).x != -1 && tempResult.get(tempResultLastPos).y != -1) {
+                if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] &&
+                        marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private void marcar(ArrayList<Integer> config, ArrayList<Product> productsTaken, int indexX, int indexY, int[][] marks) {
 
