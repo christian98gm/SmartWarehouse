@@ -230,7 +230,7 @@ public class WarehouseManager {
 
         config.add(-1);                                                                                                                                 // preparar recorregut
         round++;
-        System.out.println("Round : " + round);
+        //System.out.println("Round : " + round);
         if (config.size() > 1) {
 
             int indexConfig = config.size() - 1;
@@ -246,11 +246,12 @@ public class WarehouseManager {
                         if (tempResult.size() < bestSteps) {                                                                                            // tractar solucio
                             bestTrace = new ArrayList<>(tempResult);
                             bestSteps = bestTrace.size();
+                            System.out.println("RESULTAT TROBAT : ronda " + round + " BEST SIZE: " + bestSteps);
                         }
                     }
                 } else {                                                                                                                                // no es solucio
                     if (bona(marks)) {
-                        if (tempResult.size() < bestSteps) {                                                                                    // poda
+                        if (tempResult.size() < bestSteps) {                                                                                            // poda
                             robotBacktracking(config, productsTaken, p.x, p.y, marks);
                         }
                     }
@@ -269,8 +270,10 @@ public class WarehouseManager {
         int tempResultLastPos = tempResult.size() - 1;
         if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // es bona
             if (tempResult.get(tempResultLastPos).x != -1 && tempResult.get(tempResultLastPos).y != -1) {
-                if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] &&
-                        marks[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y] < 3) {
+                if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y]) {
+                    for(Point p:tempResult){
+                        if(marks[p.x][p.y] > 1) return false;
+                    }
                     return true;
                 }
             }
@@ -328,7 +331,7 @@ public class WarehouseManager {
             }
         }
 
-        if (tempResult.get(lastStepPos).x < warehouse.length && tempResult.get(lastStepPos).y < warehouse[0].length && tempResult.get(lastStepPos).x > 0 && tempResult.get(lastStepPos).y > 0) {
+        if (tempResult.get(lastStepPos).x < warehouse.length && tempResult.get(lastStepPos).y < warehouse[0].length && tempResult.get(lastStepPos).x >= 0 && tempResult.get(lastStepPos).y >= 0) {
             marks[tempResult.get(lastStepPos).x][tempResult.get(lastStepPos).y]--;
         }
         tempResult.remove(lastStepPos);
