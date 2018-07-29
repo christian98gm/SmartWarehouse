@@ -41,6 +41,9 @@ public class WarehouseManager {
     //Aux
     private int round;
 
+    //time counter
+    private long time;
+
     public WarehouseManager() {
     }
 
@@ -221,7 +224,11 @@ public class WarehouseManager {
         int[][] marks = new int[warehouse.length][warehouse[0].length];
         round = 0;
 
+
+        time = System.currentTimeMillis();
         robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
+        long timeDiff = System.currentTimeMillis() - time;
+        System.out.println(timeDiff);
 
     }
 
@@ -230,7 +237,6 @@ public class WarehouseManager {
 
         config.add(-1);                                                                                                                                 // preparar recorregut
         round++;
-        //System.out.println("Round : " + round);
         if (config.size() > 1) {
 
             int indexConfig = config.size() - 1;
@@ -261,7 +267,13 @@ public class WarehouseManager {
             config.remove(config.size() - 1);
         } else {
             marcar(config, productsTaken, getEntrance().x, getEntrance().y, marks);
-            robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
+            if (productsTaken.size() == commandProducts.size()) {
+                bestTrace = new ArrayList<>(tempResult);
+                bestSteps = bestTrace.size();
+                System.out.println("RESULTAT TROBAT : ronda " + round + " BEST SIZE: " + bestSteps);
+            } else {
+                robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
+            }
         }
     }
 
@@ -271,8 +283,8 @@ public class WarehouseManager {
         if (tempResult.get(tempResultLastPos).x < warehouse.length && tempResult.get(tempResultLastPos).y < warehouse[0].length) {          // es bona
             if (tempResult.get(tempResultLastPos).x != -1 && tempResult.get(tempResultLastPos).y != -1) {
                 if (!warehouse[tempResult.get(tempResultLastPos).x][tempResult.get(tempResultLastPos).y]) {
-                    for(Point p:tempResult){
-                        if(marks[p.x][p.y] > 1) return false;
+                    for (Point p : tempResult) {
+                        if (marks[p.x][p.y] > 1) return false;
                     }
                     return true;
                 }
