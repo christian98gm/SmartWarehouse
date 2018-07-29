@@ -199,7 +199,10 @@ public class WarehouseManager {
             int[] result = new int[products.size()];
 
             //Backtracking
+            time = System.currentTimeMillis();
             productBacktracking(new int[products.size()], 0, new int[products.size()], result);
+            long timeDiff = System.currentTimeMillis() - time;
+            System.out.println("temps en milisengos  = "+timeDiff);
 
             //Update shelves with their products
             ArrayList<Shelf> shelves = getCloserShelves(products.size());
@@ -228,7 +231,7 @@ public class WarehouseManager {
         time = System.currentTimeMillis();
         robotBacktracking(config, productsTaken, getEntrance().x, getEntrance().y, marks);
         long timeDiff = System.currentTimeMillis() - time;
-        System.out.println(timeDiff);
+        System.out.println("temps en milisengos  = "+timeDiff);
 
     }
 
